@@ -76,6 +76,12 @@ class _Quantity(object):
         return _build_quantity, (self.magnitude, self.units)
 
     def __new__(cls, value, units=None):
+        #make a list acceptable
+        if isinstance(value, (list,tuple)):
+            newvalue = np.zeros(len(value)) * value[0]
+            for iii,item in enumerate(value):
+                newvalue[iii] = item
+            value = newvalue
         if units is None:
             if isinstance(value, string_types):
                 if value == '':
@@ -1017,6 +1023,12 @@ class _Quantity(object):
                 return
         except (TypeError, DimensionalityError):
             pass
+
+        if isinstance(value,(list,tuple)):
+            newvalue = np.zeros(len(value))*value[0]
+            for iii,item in enumerate(value):
+                newvalue[iii] = item
+            value = newvalue
 
         try:
             if isinstance(value, self.__class__):

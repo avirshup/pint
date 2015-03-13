@@ -124,6 +124,12 @@ class _Quantity(object):
         ret.__used = self.__used
         return ret
 
+    def __deepcopy__(self,memo):
+        memo[id(self)] = self
+        ret = self.__class__(copy.deepcopy(self._magnitude,memo), copy.copy(self._units))
+        ret.__used = self.__used
+        return ret
+
     def __str__(self):
         return format(self)
 
@@ -962,7 +968,7 @@ class _Quantity(object):
         """
         if func.__name__ in self.__require_units:
             self.__ito_if_needed(self.__require_units[func.__name__])
-
+        
         value = func(*args, **kwargs)
 
         if func.__name__ in self.__copy_units:
@@ -1054,6 +1060,11 @@ class _Quantity(object):
         units = self._units
         return [self.__class__(value, units).tolist() if isinstance(value, list) else self.__class__(value, units)
                 for value in self._magnitude.tolist()]
+
+    @property
+    def flat(self):
+        units = self._units
+        for item in self._magnitude.flat: yield self.__class__(item,units)
 
     __array_priority__ = 17
 
